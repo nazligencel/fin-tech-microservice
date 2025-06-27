@@ -3,6 +3,15 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="transaction-service" />
+        <module name="auth-service" />
+        <module name="eureka-server" />
+      </profile>
       <profile name="Annotation profile for fin-tech" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -12,20 +21,19 @@
         </processorPath>
         <module name="fin-tech" />
       </profile>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
-        <module name="eureka-server" />
-      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="fin-tech (1)" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
+      <module name="auth-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="fin-tech" options="-parameters" />
+      <module name="fin-tech (1)" options="-parameters" />
+      <module name="transaction-service" options="-parameters" />
     </option>
   </component>
 </project>
