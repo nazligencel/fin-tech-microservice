@@ -1,7 +1,6 @@
 package com.transaction_service.transaction_service.repositories;
 
 import com.fintech.fin_tech.dto.CategorySummaryDto;
-import com.fintech.fin_tech.model.Transaction;
 import com.transaction_service.transaction_service.model.Transaction;
 import com.transaction_service.transaction_service.model.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
