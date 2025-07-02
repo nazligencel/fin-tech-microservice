@@ -1,7 +1,7 @@
 package com.transaction_service.transaction_service.services;
 
-import com.fintech.fin_tech.dto.CategorySummaryDto;
-import com.fintech.fin_tech.dto.DashboardSummaryDto;
+import com.transaction_service.transaction_service.dto.DashboardSummaryDto;
+import com.transaction_service.transaction_service.dto.CategorySummaryDto;
 import com.transaction_service.transaction_service.model.Transaction;
 import org.springframework.stereotype.Service;
 

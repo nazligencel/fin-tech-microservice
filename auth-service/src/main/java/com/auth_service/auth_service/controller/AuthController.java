@@ -1,12 +1,9 @@
-package com.fintech.fin_tech.controller;
+package com.auth_service.auth_service.controller;
 
-import com.fintech.fin_tech.config.security.CustomUserDetails;
-import com.fintech.fin_tech.config.security.JwtUtil;
-import com.fintech.fin_tech.dto.JwtResponse;
-import com.fintech.fin_tech.dto.LoginRequest;
-import com.fintech.fin_tech.dto.RegisterRequest;
-import com.fintech.fin_tech.model.User;
-import com.fintech.fin_tech.repositories.UserRepository;
+import com.auth_service.auth_service.config.security.*;
+import com.auth_service.auth_service.model.User;
+import com.auth_service.auth_service.repositories.UserRepository;
+import com.auth_service.auth_service.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

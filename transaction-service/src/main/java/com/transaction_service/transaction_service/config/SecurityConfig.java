@@ -1,46 +1,29 @@
-package com.fintech.fin_tech.config;
-
-import com.fintech.fin_tech.config.security.CustomUserDetailsService;
-import com.fintech.fin_tech.config.security.JwtAuthenticationEntryPoint;
-import com.fintech.fin_tech.config.security.JwtRequestFilter;
+package com.transaction_service.transaction_service.config;
+import com.transaction_service.transaction_service.config.security.JwtAuthenticationEntryPoint;
+import com.transaction_service.transaction_service.config.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity //Spring security web güvenliğini etkinleştirir
-@EnableMethodSecurity //metot seviyesi güvenlik için, mesela bir rol ekleme yetkisi varken silme yetkisi olmayabilir, silme metoduna erişimi kısıtlar
+@EnableMethodSecurity(prePostEnabled = true) //metot seviyesi güvenlik için, mesela bir rol ekleme yetkisi varken silme yetkisi olmayabilir, silme metoduna erişimi kısıtlar
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtRequestFilter jwtRequestFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        this.customUserDetailsService = customUserDetailsService;
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtRequestFilter = jwtRequestFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -48,10 +31,10 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                //kimlik doğrulama başarısız olduğunda 401
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//sunucu da ssession tutulmayacak
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/transactions/**").hasRole("USER")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 /**
@@ -59,7 +42,6 @@ public class SecurityConfig {
                  * JWT filtersini spring security filtre zincirine eklenir
                  * UsernamePasswordAuthenticationFilter'den önce çalışacak
                  */
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

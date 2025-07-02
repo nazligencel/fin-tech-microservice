@@ -1,6 +1,6 @@
 package com.transaction_service.transaction_service.repositories;
 
-import com.fintech.fin_tech.dto.CategorySummaryDto;
+import com.transaction_service.transaction_service.dto.CategorySummaryDto;
 import com.transaction_service.transaction_service.model.Transaction;
 import com.transaction_service.transaction_service.model.TransactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,14 +29,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     );
 
     // Belirli bir kullanıcı için kategorilere göre gider toplamları
-    @Query("SELECT new com.fintech.fin_tech.dto.CategorySummaryDto(t.category, COALESCE(SUM(t.amount), 0)) " +
+    @Query("SELECT new com.transaction_service.transaction_service.dto.CategorySummaryDto(t.category, COALESCE(SUM(t.amount), 0)) " +
             "FROM Transaction t " +
             "WHERE t.userId = :userId AND t.type = com.transaction_service.transaction_service.model.TransactionType.EXPENSE " +
             "GROUP BY t.category")
     List<CategorySummaryDto> findExpenseSumByCategoryForUser(@Param("userId") Long userId);
 
     // Belirli bir kullanıcı, yıl ve ay için kategorilere göre gider toplamları
-    @Query("SELECT new com.fintech.fin_tech.dto.CategorySummaryDto(t.category, COALESCE(SUM(t.amount), 0)) " +
+    @Query("SELECT new com.transaction_service.transaction_service.dto.CategorySummaryDto(t.category, COALESCE(SUM(t.amount), 0)) " +
             "FROM Transaction t " +
             "WHERE t.userId = :userId AND t.type = com.transaction_service.transaction_service.model.TransactionType.EXPENSE " +
             "AND YEAR(t.transactionDate) = :year AND MONTH(t.transactionDate) = :month " +

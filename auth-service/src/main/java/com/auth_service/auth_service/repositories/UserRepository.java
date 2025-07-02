@@ -1,6 +1,6 @@
-package com.fintech.fin_tech.repositories;
+package com.auth_service.auth_service.repositories;
 
-import com.fintech.fin_tech.model.User;
+import com.auth_service.auth_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

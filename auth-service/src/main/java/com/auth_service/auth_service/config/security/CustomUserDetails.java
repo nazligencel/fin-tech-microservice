@@ -1,7 +1,6 @@
-package com.fintech.fin_tech.config.security;
+package com.auth_service.auth_service.config.security;
 
-import com.fintech.fin_tech.model.User;
-import lombok.Data;
+import com.auth_service.auth_service.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

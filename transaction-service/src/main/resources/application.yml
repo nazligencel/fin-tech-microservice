@@ -4,13 +4,13 @@ spring:
   profiles:
     active: dev
   datasource:
-    # URL'i t?rnak içine almak, özel karakterlerden kaynaklanabilecek sorunlar? önler.
+    # URL'yi tirnak icine almak, ozel karakterlerden kaynaklanabilecek sorunlari onler.
     url: "jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # JPA ve Hibernate ayarlar?
+  # JPA ve Hibernate ayarlari
   jpa:
     properties:
       hibernate:
@@ -24,14 +24,16 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          # Eger Keycloak kullanmiyorsaniz bu blogu tamamen silin.
+          # Eger kullaniyorsaniz, bu servisin de Keycloak'a ulasmasi gerekir.
           issuer-uri: http://keycloak:8080/realms/microservices
 
-# Uygulamaya özel (custom) ayarlar
+# Uygulamaya ozel (custom) ayarlar
 app:
   jwt:
-    secret: ${JWT_SECRET}
-    expiration: ${EXPIRATION_DURATION:PT1H}
+    secret: ${JWT_SECRET} # AUTH-SERVICE ILE AYNI OLMALI!
+    expiration: ${EXPIRATION_DURATION:PT1H} # Bu burada cok gerekli degil, token burada uretilmiyor.
 
-# Sunucu ayarlar?
+# Sunucu ayarlari
 server:
   port: ${PORT:8085}

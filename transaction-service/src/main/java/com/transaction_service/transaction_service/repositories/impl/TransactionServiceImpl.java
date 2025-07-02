@@ -2,13 +2,14 @@ package com.transaction_service.transaction_service.repositories.impl;
 
 
 import com.transaction_service.transaction_service.config.security.JwtUtil;
-import com.fintech.fin_tech.dto.CategorySummaryDto;
-import com.fintech.fin_tech.dto.DashboardSummaryDto;
+
+import com.transaction_service.transaction_service.dto.CategorySummaryDto;
+import com.transaction_service.transaction_service.dto.DashboardSummaryDto;
 import com.transaction_service.transaction_service.services.TransactionService;
 import com.transaction_service.transaction_service.model.Transaction;
 import com.transaction_service.transaction_service.model.TransactionType;
 import com.transaction_service.transaction_service.repositories.TransactionRepository;
-import io.jsonwebtoken.Claims;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,18 +40,23 @@ public class TransactionServiceImpl implements TransactionService {
      */
     private Long getCurrentUserIdFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User is not authenticated");
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User identity verification failed");
         }
 
-        String username = jwtUtil.extractUsername(authentication.getName()); //jwtutil den kullanıcı adı alındı
-        Claims claims = jwtUtil.extractAllClaims(authentication.getName()); //jwt den claimleri al
-
-        Integer userIdInt = claims.get("user_id", Integer.class);
-        if (userIdInt == null) {
-            throw new IllegalStateException("The JWT token does not contain the 'user_id' claim.");
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Long) {
+            return (Long) principal;
         }
-        return userIdInt.longValue();
+
+        // Eğer principal Long değilse, bir hata veya beklenmedik durum var demektir.
+        // Belki de "anonymousUser" string'i gelmiştir.
+        if (principal instanceof String && principal.equals("anonymousUser")) {
+            throw new IllegalStateException("User is anonymous, not an authorized user");
+        }
+
+        throw new IllegalStateException("The authentication principal is of an unexpected type: " + principal.getClass().getName());
     }
 
 
@@ -129,9 +135,9 @@ public class TransactionServiceImpl implements TransactionService {
     public List<CategorySummaryDto> getExpenseSummaryByCategoryForCurrentUser(Integer year, Integer month) {
         Long currentUserId = getCurrentUserIdFromToken();
         if (year != null && month != null) {
-            return transactionRepository.findExpenseSumByCategoryAndYearAndMonthForUser( Long currentUserId = getCurrentUserIdFromToken();, year, month);
+            return transactionRepository.findExpenseSumByCategoryAndYearAndMonthForUser(currentUserId, year, month);
         } else {
-            return transactionRepository.findExpenseSumByCategoryForUser( Long currentUserId = getCurrentUserIdFromToken(););
+            return transactionRepository.findExpenseSumByCategoryForUser(currentUserId);
         }
     }
 }

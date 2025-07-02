@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/fintech
+    username: root
+    password: 1234
+
+server:
+  port: 8081
+
+app:
+  verify-host: http://localhost:8081
+  ui-app-url: http://localhost:5173
+  jwt:
+    secret: eU7Gvpt6X2P9fEJvV+0wz1oRj9tcgQ5BdMniA8xYgls=
+    access-token-expiration-ms: 3600000

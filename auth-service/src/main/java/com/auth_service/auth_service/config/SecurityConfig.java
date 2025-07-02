@@ -1,8 +1,7 @@
-package com.fintech.fin_tech.config;
+package com.auth_service.auth_service.config;
 
-import com.fintech.fin_tech.config.security.CustomUserDetailsService;
-import com.fintech.fin_tech.config.security.JwtAuthenticationEntryPoint;
-import com.fintech.fin_tech.config.security.JwtRequestFilter;
+import com.auth_service.auth_service.config.security.*;
+import com.auth_service.auth_service.config.security.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
