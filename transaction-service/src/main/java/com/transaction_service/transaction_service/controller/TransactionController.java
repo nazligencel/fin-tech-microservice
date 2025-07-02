@@ -1,16 +1,14 @@
-package com.fintech.fin_tech.controller;
+package com.transaction_service.transaction_service.controller;
 
-import com.fintech.fin_tech.config.security.CustomUserDetails;
-import com.fintech.fin_tech.dto.CategorySummaryDto;
-import com.fintech.fin_tech.dto.DashboardSummaryDto;
-import com.fintech.fin_tech.model.Transaction;
-import com.fintech.fin_tech.services.TransactionService;
+
+import com.transaction_service.transaction_service.dto.CategorySummaryDto;
+import com.transaction_service.transaction_service.dto.DashboardSummaryDto;
+import com.transaction_service.transaction_service.model.Transaction;
+import com.transaction_service.transaction_service.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,24 +19,12 @@ import java.util.List;
 public class TransactionController {
 
     private TransactionService transactionService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public TransactionController(TransactionService transactionService, UserRepository userRepository) {
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
-        this.userRepository = userRepository;
     }
 
-    private User getCurrentUserEntity() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            // Bu durum @PreAuthorize("isAuthenticated()") tarafından yakalanmalı
-            throw new IllegalStateException("Kullanıcı kimliği doğrulanmamış.");
-        }
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("Kimliği doğrulanmış kullanıcı veritabanında bulunamadı."));
-    }
 
     @PostMapping
     public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {

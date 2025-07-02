@@ -1,4 +1,4 @@
-package com.fintech.fin_tech.model;
+package com.auth_service.auth_service.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,15 +45,4 @@ public class User  {
         this.roles = roles;
 
     }
-
-    /**
-     * TODO cascade = CascadeType.ALL projeye göre ileride güncellenebilir
-     * cascade = CascadeType.ALL: Bir  User kaydedildiğinde/güncellendiğinde silindiğinde ilişkili Transaction'lar da etkilenir)
-     * mappedBy = "user" ilişkinin Transaction entity'sindeki user alanı tarafından yönetildiğini belirtir.
-     * orphanRemoval = true: Bir Transaction User'ın transactions setinden çıkarıldığında, o Transaction'ın veritabanından da silinmesini sağlar.
-     */
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Transaction> transactions = new HashSet<>();
-
 }

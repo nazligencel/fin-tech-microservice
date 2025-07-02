@@ -1,4 +1,4 @@
-package com.fintech.fin_tech.dto;
+package com.transaction_service.transaction_service.dto;
 
 import lombok.Data;
 

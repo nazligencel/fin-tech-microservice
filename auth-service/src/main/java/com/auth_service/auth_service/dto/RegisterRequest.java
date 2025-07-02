@@ -1,4 +1,4 @@
-package com.fintech.fin_tech.dto;
+package com.auth_service.auth_service.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

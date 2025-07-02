@@ -1,7 +1,7 @@
-package com.fintech.fin_tech.config.security;
+package com.auth_service.auth_service.config.security;
 
-import com.fintech.fin_tech.model.User;
-import com.fintech.fin_tech.repositories.UserRepository;
+import com.auth_service.auth_service.model.User;
+import com.auth_service.auth_service.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

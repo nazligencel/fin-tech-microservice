@@ -1,29 +1,27 @@
 package com.transaction_service.transaction_service.config.security;
 
-import com.fintech.fin_tech.config.security.CustomUserDetails;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 @Component
 public class JwtUtil {
 
-    private final com.fintech.fin_tech.config.security.JwtConfig jwtConfig;
+    private final JwtConfig jwtConfig;
 
-    public JwtUtil(com.fintech.fin_tech.config.security.JwtConfig jwtConfig) {
+    public JwtUtil(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
 
@@ -61,14 +59,6 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    // UserDetails nesnesinden access token üretir
-    public String generateAccessToken(CustomUserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("user_id", userDetails.getId());
-        claims.put("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
-        long expirationTimeInMs = this.jwtConfig.expiration().toMillis();
-        return createToken(claims, userDetails.getUsername(), expirationTimeInMs);
-    }
 
     // Belirli claim'ler, kullanıcı adı ve geçerlilik süresi ile token oluşturur
     private String createToken(Map<String, Object> claims, String subject, long expirationTime) {
@@ -85,5 +75,23 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    public Boolean validateToken(String token) {
+        try {
+            // Jwts.parserBuilder() ile token'ı parse etmeye çalışmak,
+            // imza veya format hatalıysa veya süresi dolmuşsa bir exception fırlatacaktır.
+            // Eğer exception fırlatmazsa, token geçerlidir.
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SignatureException | io.jsonwebtoken.MalformedJwtException e) {
+            // logger.error("Invalid JWT signature or structure: {}", e.getMessage());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (io.jsonwebtoken.UnsupportedJwtException e) {
+            // logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            // logger.error("JWT claims string is empty: {}", e.getMessage());
+        }
+        return false;
     }
 }

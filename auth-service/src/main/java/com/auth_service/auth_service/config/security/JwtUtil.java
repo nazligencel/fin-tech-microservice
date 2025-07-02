@@ -1,12 +1,10 @@
 package com.auth_service.auth_service.config.security;
 
-import com.fintech.fin_tech.config.security.CustomUserDetails;
-import com.fintech.fin_tech.config.security.JwtConfig;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -22,13 +20,13 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-    private final com.fintech.fin_tech.config.security.JwtConfig jwtConfig;
+    private final JwtConfig jwtConfig;
 
     public JwtUtil(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
 
-    public String generateAccessToken(CustomUserDetails userDetails) { // CustomUserDetails alması daha iyi
+    public String generateAccessToken(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user_id", userDetails.getId()); // Kullanıcı ID'sini ekle
         claims.put("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));

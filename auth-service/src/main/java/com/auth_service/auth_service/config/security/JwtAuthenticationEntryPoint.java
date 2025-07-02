@@ -1,4 +1,4 @@
-package com.fintech.fin_tech.config.security;
+package com.auth_service.auth_service.config.security;
 
 
 import jakarta.servlet.ServletException;
