@@ -1,4 +1,4 @@
-package com.fintech.fin_tech.config;
+package com.transaction_service.transaction_service.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

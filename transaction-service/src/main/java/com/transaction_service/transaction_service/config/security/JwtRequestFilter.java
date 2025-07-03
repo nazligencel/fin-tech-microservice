@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -67,7 +66,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.extractAllClaims(jwt);
 
                 // "user_id" claim'ini Long olarak al.
-                Integer userIdInt = claims.get("user_id", Integer.class); // auth-service'te ne isimle koyduysanız
+                Integer userIdInt = claims.get("user_id", Integer.class); // auth-service'te hangi isimle ise
                 if (userIdInt == null) {
                     throw new IllegalArgumentException("JWT token does not contain 'user_id' claim.");
                 }
