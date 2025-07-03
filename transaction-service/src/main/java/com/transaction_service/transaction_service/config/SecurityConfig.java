@@ -1,6 +1,4 @@
 package com.transaction_service.transaction_service.config;
-import com.transaction_service.transaction_service.config.security.JwtAuthenticationEntryPoint;
-import com.transaction_service.transaction_service.config.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,32 +15,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(prePostEnabled = true) //metot seviyesi güvenlik için, mesela bir rol ekleme yetkisi varken silme yetkisi olmayabilir, silme metoduna erişimi kısıtlar
 public class SecurityConfig {
 
-    private final JwtRequestFilter jwtRequestFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Autowired
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
-        this.jwtRequestFilter = jwtRequestFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-                //kimlik doğrulama başarısız olduğunda 401
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//sunucu da ssession tutulmayacak
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Bu servise gelen tüm isteklerin kimliğinin doğrulanmış olmasını istiyoruz
                         .anyRequest().authenticated()
                 )
-                /**
-                 * session yönetimi sunucu tarafında tutulmayacak JWT ile yönetilecek
-                 * JWT filtersini spring security filtre zincirine eklenir
-                 * UsernamePasswordAuthenticationFilter'den önce çalışacak
-                 */
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                // Bu satır, Spring Security'ye gelen Bearer token'ları
+                // issuer-uri'ye göre otomatik olarak doğrulamasını söyler.
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }

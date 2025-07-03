@@ -26,14 +26,12 @@ spring:
         jwt:
           # Eger Keycloak kullanmiyorsaniz bu blogu tamamen silin.
           # Eger kullaniyorsaniz, bu servisin de Keycloak'a ulasmasi gerekir.
-          issuer-uri: http://keycloak:8080/realms/microservices
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:9080/realms/fintech-realm}
 
-# Uygulamaya ozel (custom) ayarlar
-app:
-  jwt:
-    secret: ${JWT_SECRET} # AUTH-SERVICE ILE AYNI OLMALI!
-    expiration: ${EXPIRATION_DURATION:PT1H} # Bu burada cok gerekli degil, token burada uretilmiyor.
-
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
 # Sunucu ayarlari
 server:
   port: ${PORT:8085}

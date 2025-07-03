@@ -1,8 +1,6 @@
 package com.transaction_service.transaction_service.repositories.impl;
 
 
-import com.transaction_service.transaction_service.config.security.JwtUtil;
-
 import com.transaction_service.transaction_service.dto.CategorySummaryDto;
 import com.transaction_service.transaction_service.dto.DashboardSummaryDto;
 import com.transaction_service.transaction_service.services.TransactionService;
@@ -13,6 +11,8 @@ import com.transaction_service.transaction_service.repositories.TransactionRepos
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,53 +24,47 @@ import java.util.Optional;
 public class TransactionServiceImpl implements TransactionService {
 
     private TransactionRepository transactionRepository;
-    private final JwtUtil jwtUtil;// JWT parse edilip içinden userId alınacak
 
     @Autowired
-    public TransactionServiceImpl(TransactionRepository transactionRepository, JwtUtil jwtUtil) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
-        this.jwtUtil = jwtUtil;
+
     }
-    /**
-     * Güvenlik context'inden gelen JWT'yi parse ederek mevcut kullanıcının ID'sini alır.
-     * Bu metot, bu servisteki tüm işlemlerin doğru kullanıcıya ait olmasını sağlar.
-     * JWT'nin "userId" adında bir claim içermesi beklenir.
-     * @return Mevcut kullanıcının Long tipindeki ID'si.
-     * @throws IllegalStateException Kullanıcı kimliği doğrulanamazsa veya token'da ID yoksa.
-     */
-    private Long getCurrentUserIdFromToken() {
+
+    private String getCurrentUserIdFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalStateException("User identity verification failed");
         }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof Long) {
-            return (Long) principal;
+        if (authentication.getPrincipal() instanceof Jwt) {
+            Jwt jwt = (Jwt) authentication.getPrincipal();
+            // Keycloak'un standart kullanıcı ID'si 'sub' (subject) claim'indedir
+            String userIdString = jwt.getSubject();
+            if (userIdString != null) {
+                throw new IllegalStateException("JWT token does not contain user id claim");
+            }
+            return jwt.getSubject();
         }
-
-        // Eğer principal Long değilse, bir hata veya beklenmedik durum var demektir.
-        // Belki de "anonymousUser" string'i gelmiştir.
-        if (principal instanceof String && principal.equals("anonymousUser")) {
-            throw new IllegalStateException("User is anonymous, not an authorized user");
-        }
-
-        throw new IllegalStateException("The authentication principal is of an unexpected type: " + principal.getClass().getName());
+        /**
+         *Keycloak'un ID'si UUID formatında bir string'dir
+         *
+         */
+        throw new IllegalStateException("Authentication principal is of an unexpected type " + authentication.getPrincipal().getClass().getName());
     }
 
 
     @Override
     @Transactional
     public Transaction addTransaction(Transaction transaction) {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String currentUserId = getCurrentUserIdFromToken();
         transaction.setUserId(currentUserId);
         return transactionRepository.save(transaction);
     }
     @Override
     @Transactional(readOnly = true)
     public List<Transaction> getAllTransactionsForCurrentUser() {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String  currentUserId = getCurrentUserIdFromToken();
         // Repository metodu artık 'userId' ile çalışıyor
         return transactionRepository.findByUserId(currentUserId);
     }
@@ -78,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Transaction> getTransactionByIdForCurrentUser(Long transactionId) {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String currentUserId = getCurrentUserIdFromToken();
         // Önce işlemi bul, sonra o işlemin kullanıcımıza ait olup olmadığını kontrol et.
         return transactionRepository.findById(transactionId)
                 .filter(transaction -> transaction.getUserId().equals(currentUserId));
@@ -86,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction updateTransactionForCurrentUser(Long transactionId, Transaction transactionDetails) {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String currentUserId = getCurrentUserIdFromToken();
         Transaction existingTransaction = transactionRepository.findById(transactionId)
                 .filter(transaction -> transaction.getUserId().equals(currentUserId))
                 .orElseThrow(() -> new RuntimeException("Transaction not found with transactionId: " + transactionId + " for current user"));
@@ -102,7 +96,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void deleteTransactionForCurrentUser(Long transactionId) {
-        Long currentUserId = getCurrentUserIdFromToken();
         //önce silinecek işlemi bul ve sahibinin mevcut kullanıcı olduğunu doğrula
         Transaction transactionDelete = transactionRepository.findById(transactionId)
                 .filter(transaction -> transaction.getUserId().equals(transactionId))
@@ -113,7 +106,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public DashboardSummaryDto getDashboardSummaryForCurrentUser(Integer year, Integer month) {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String currentUserId = getCurrentUserIdFromToken();
 
         BigDecimal totalIncome;
         BigDecimal totalExpense;
@@ -133,7 +126,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<CategorySummaryDto> getExpenseSummaryByCategoryForCurrentUser(Integer year, Integer month) {
-        Long currentUserId = getCurrentUserIdFromToken();
+        String currentUserId = getCurrentUserIdFromToken();
         if (year != null && month != null) {
             return transactionRepository.findExpenseSumByCategoryAndYearAndMonthForUser(currentUserId, year, month);
         } else {

@@ -36,5 +36,5 @@ public class Transaction {
     private String description;
 
     @JoinColumn(name = "user_id", nullable = false)
-    private Long userId;
+    private String userId;
 }

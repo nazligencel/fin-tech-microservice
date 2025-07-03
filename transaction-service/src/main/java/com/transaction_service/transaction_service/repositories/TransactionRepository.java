@@ -13,16 +13,16 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    List<Transaction> findByUserId(Long id);
+    List<Transaction> findByUserId(String id);
 
     // Belirli bir kullanıcı ve tür için toplam tutar (Tüm zamanlar)
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type") //COALESCE burada, sorgunun sonucunun NULL değil her zaman olmasını garanti eder
-    BigDecimal sumAmountByUserIdAndType(@Param("userId") Long userId, @Param("type") TransactionType type);
+    BigDecimal sumAmountByUserIdAndType(@Param("userId") String userId, @Param("type") TransactionType type);
 
     // Belirli bir kullanıcı, tür, yıl ve ay için toplam tutar
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.userId = :userId AND t.type = :type AND YEAR(t.transactionDate) = :year AND MONTH(t.transactionDate) = :month")
     BigDecimal sumAmountByUserIdAndTypeAndYearAndMonth(
-            @Param("userId") Long userId,
+            @Param("userId") String userId,
             @Param("type") TransactionType type,
             @Param("year") int year,
             @Param("month") int month
@@ -33,7 +33,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "FROM Transaction t " +
             "WHERE t.userId = :userId AND t.type = com.transaction_service.transaction_service.model.TransactionType.EXPENSE " +
             "GROUP BY t.category")
-    List<CategorySummaryDto> findExpenseSumByCategoryForUser(@Param("userId") Long userId);
+    List<CategorySummaryDto> findExpenseSumByCategoryForUser(@Param("userId") String userId);
 
     // Belirli bir kullanıcı, yıl ve ay için kategorilere göre gider toplamları
     @Query("SELECT new com.transaction_service.transaction_service.dto.CategorySummaryDto(t.category, COALESCE(SUM(t.amount), 0)) " +
@@ -42,7 +42,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "AND YEAR(t.transactionDate) = :year AND MONTH(t.transactionDate) = :month " +
             "GROUP BY t.category")
     List<CategorySummaryDto> findExpenseSumByCategoryAndYearAndMonthForUser(
-            @Param("userId") Long userId,
+            @Param("userId") String userId,
             @Param("year") int year,
             @Param("month") int month
     );
