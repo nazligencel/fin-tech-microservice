@@ -1,26 +1,24 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: api-gateway
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: transaction-service-route
+          uri: lb://TRANSACTION-SERVICE
+          predicates:
+            - Path=/api/transactions/**
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:9080/realms/fintech-realm}
 
-  cloud:
-    gateway:
-      routes:
-        - id: transaction-service-route
-          uri: lb://TRANSACTION-SERVICE # Eureka'daki servis ad?
-          predicates:
-            - Path=/api/transactions/** # Bu yola gelen istekleri TRANSACTION-SERVICE'e yönlendir
-        # NOT: Art?k bir auth-service olmad??? için onun route'una gerek yok.
-        # Login/Register i?lemleri do?rudan frontend'den Keycloak'a yönlendirme ile yap?lacak.
-server:
-  port : 8080
-
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
-

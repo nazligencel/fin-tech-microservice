@@ -1,25 +1,16 @@
 package com.fintech.api_gateway;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    // application.yml dosyasından issuer-uri değerini alıyoruz
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuerUri;
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
@@ -40,7 +31,7 @@ public class SecurityConfig {
                         .pathMatchers("/eureka/**").permitAll()
 
                         // Transaction servisine giden tüm yolların kimliğinin doğrulanmış olmasını ve
-                        // "USER" rolüne sahip olmasını zorunlu kılalım.
+                        // "USER" rolüne sahip olmasını zorunlu kıl.
                         .pathMatchers("/api/transactions/**").hasRole("USER") // 'USER' rolünü gerektirir
 
                         // Diğer tüm isteklerin de kimliğinin doğrulanmış olmasını isteyelim
@@ -54,12 +45,5 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public ReactiveJwtDecoder jwtDecoder() {
-        // issuer-uri'yi kullanarak JWT decoder'ı oluşturuyoruz.
-        // Spring geri kalanı (anahtarları indirme, cache'leme vb.) halledecektir.
-        return ReactiveJwtDecoders.fromOidcIssuerLocation(issuerUri);
     }
 }

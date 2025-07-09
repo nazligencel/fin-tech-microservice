@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   api-gateway:
     build: ./api-gateway
@@ -10,14 +9,14 @@ services:
     depends_on:
       - eureka-server
       - keycloak
-      - transaction-service # Tüm servislerin başlamasını beklesin
+      - transaction-service # Tüm servislerin baslamasi beklesin
     environment:
-        # Gateway'in çalışacağı port
+        # Gateway'in calisacagi port
         - SERVER_PORT=8080
-        # Eureka Server'ın adresi (container network'ü üzerinden servis adıyla)
+        # Eureka Server'in adresi (container network'ü üzerinden servis adiyla)
         - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-        # Keycloak issuer URI (container network'ü üzerinden servis adıyla)
-        - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9080/realms/fintech-realm # realm adını kontrol et
+        # Keycloak issuer URI (container network'ü üzerinden servis adiyla)
+        - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9080/realms/fintech-realm
 
   eureka-server:
     build: ./eureka-server
@@ -40,15 +39,15 @@ services:
     depends_on:
         - eureka-server
         - keycloak
-        - mysql-db # Veritabanının başlamasını beklesi
+        - mysql-db # veritabaninin baslamasini bekle
     environment:
-      # Servisin çalışacağı port
+      # Servisin calisacagi port
       - SERVER_PORT=8085
-      # Eureka Server'ın adresi
+      # Eureka Server'in adresi
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
       # Keycloak issuer URI
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9080/realms/fintech-realm # realm adını kontrol et
-      # Veritabanı bağlantı bilgileri (container network'ü üzerinden servis adıyla)
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9080/realms/fintech-realm
+      # Veritabani baglanti bilgileri (container network'ü üzerinden servis adıyla)
       - MYSQL_HOST=mysql-db
       - MYSQL_PORT=3306
       - MYSQL_DATABASE=fintech # Kendi veritabanı adın
@@ -83,11 +82,8 @@ services:
       - mysql_data:/var/lib/mysql # MySQL verilerini kalıcı hale getirir
     networks:
       - fintech-network
-      - # ./init:/docker-entrypoint-initdb.d kısmı veritabanı ilk oluştuğunda çalışacak SQL scriptleri içindir.
-      # Eğer böyle bir klasörünüz ve script'iniz yoksa bu satırı kaldırabilirsiniz.
 networks:
   fintech-network:
-      driver: bridge
 volumes:
-  -mysql_data: # Veri kalıcılığı için adlandırılmış bir volume tanımlar
+  mysql_data: # Veri kalıcılığı için adlandırılmış bir volume tanımlar
 
